@@ -16,7 +16,7 @@ def main():
     assert len(city_starts) == len(cities)
     for i in range(len(cities)):
         city = cities[i]
-        city_files = [file for file in files if city in file]
+        city_files = [file for file in files if city + '_' in file]
         for file in city_files:
             if '_bi' in file:
                 last_num = 0

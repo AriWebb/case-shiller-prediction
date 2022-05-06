@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bd72eea8-fdd2-41e0-bc91-739d506cabfa" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../Case_Shiller_processed.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Laywood Random Scripts.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Patents_processed.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Processed Stock Data/DOW_processed.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Processed Stock Data/NASDAQ_processed.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Processed Stock Data/SP_processed.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../cpi/cpi.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../cpi/cpi.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,6 +73,7 @@
       <workItem from="1651821083933" duration="21000" />
       <workItem from="1651821147542" duration="6622000" />
       <workItem from="1651836164906" duration="4000" />
+      <workItem from="1651836350081" duration="8000" />
     </task>
     <servers />
   </component>
@@ -85,6 +81,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/crime$main.coverage" NAME="main Coverage Results" MODIFIED="1651826321490" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/crime$main.coverage" NAME="main Coverage Results" MODIFIED="1651836351383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
