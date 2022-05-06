@@ -23,18 +23,14 @@ def main():
     # Combine all city data
     all_data = {}
     for file in city_files:
-        first_row = True
         for row in open(file):
-            if first_row:
-                first_row = False
+            row = row.strip().split(',')
+            key = row[0] + ',' + row[1]
+            if key not in all_data:
+                all_data[key] = [value for value in row[2:]]
             else:
-                row = row.strip().split(',')
-                key = row[0] + ',' + row[1]
-                if key not in all_data:
-                    all_data[key] = [value for value in row[2:]]
-                else:
-                    for value in row[2:]:
-                        all_data[key].append(value)
+                for value in row[2:]:
+                    all_data[key].append(value)
 
     # Keep examples with all features and label
     num_features = max([len(lst)] for lst in all_data.values())[0]
