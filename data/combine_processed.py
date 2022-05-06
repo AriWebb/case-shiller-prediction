@@ -1,12 +1,10 @@
 import csv
 
-LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
-          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
-
 cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
-LABELS = cities + ['date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
+LABELS = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
+          'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
           'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
 
 
@@ -26,18 +24,14 @@ def main():
     # Combine all city data
     all_data = {}
     for file in city_files:
-        first_row = True
         for row in open(file):
-            if first_row:
-                first_row = False
+            row = row.strip().split(',')
+            key = row[0] + ',' + row[1]
+            if key not in all_data:
+                all_data[key] = [value for value in row[2:]]
             else:
-                row = row.strip().split(',')
-                key = row[0] + ',' + row[1]
-                if key not in all_data:
-                    all_data[key] = [value for value in row[2:]]
-                else:
-                    for value in row[2:]:
-                        all_data[key].append(value)
+                for value in row[2:]:
+                    all_data[key].append(value)
 
     # Keep examples with all features and label
     num_features = max([len(lst)] for lst in all_data.values())[0]
@@ -52,7 +46,7 @@ def main():
             future_year_str = str(future_year_int)
         future_date = future_month_str + future_year_str
         # If we have the label and all the features
-        future_key = city + ',' + future_date
+        future_key = city + ',' + future_date  # Date five years in the future
         if future_key in case_shiller_dict.keys() and len(all_data[key]) == num_features:
             full_data[key] = all_data[key]
             full_data[key].append(case_shiller_dict[future_key])
@@ -65,6 +59,11 @@ def main():
                 if row.strip().split(',')[0] == date:
                     full_data[key].append(row.strip().split(',')[1])
                     break
+
+    # Move label to last entry
+    for key in full_data:
+        full_data[key].append(full_data[key].pop(-4))
+
     #Make a dictionary mapping city names to one-hot representations
     #one-hot representations are based on cities list
     d_one_hot = {}
