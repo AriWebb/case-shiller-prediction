@@ -6,6 +6,9 @@ LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents',
 cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
+LABELS = cities + ['date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
+          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
+
 
 def main():
     city_files = ['cpi/cpi.csv', 'crime/crime.csv', 'Patents_processed.csv',
@@ -87,7 +90,7 @@ def main():
         data.append(key.split(',')[1])
         for value in full_data[key]:
             data.append(value)
-        #assert (len(data) == len(LABELS))
+        assert (len(data) == len(LABELS))
         writer.writerow(data)
     f.close()
 
