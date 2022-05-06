@@ -3,8 +3,11 @@ import csv
 LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
           'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
 
+cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
+          'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
+
+
 def main():
-    all_data = {}
     city_files = ['cpi/cpi.csv', 'crime/crime.csv', 'Patents_processed.csv',
                   'Population_processed.csv', 'unemployment_processed.csv', 'Case_Shiller_processed.csv']
     stock_files = ['Processed_Stock_Data/DOW_processed.csv', 'Processed_Stock_Data/NASDAQ_processed.csv',
@@ -18,6 +21,7 @@ def main():
         case_shiller_dict[city_date] = row[2]
 
     # Combine all city data
+    all_data = {}
     for file in city_files:
         first_row = True
         for row in open(file):
@@ -58,16 +62,29 @@ def main():
                 if row.strip().split(',')[0] == date:
                     full_data[key].append(row.strip().split(',')[1])
                     break
-
+    #Make a dictionary mapping city names to one-hot representations
+    #one-hot representations are based on cities list
+    d_one_hot = {}
+    one = '1,'
+    zero = '0,'
+    for i in range(len(cities)):
+        cur = []
+        for j in range(len(cities)):
+            if j == i:
+                cur += one
+            else:
+                cur += zero
+        d_one_hot[cities[i]] = cur
     # Write to csv
-    f = open('all_data_w_city_names.csv', 'w')
+    #for windows I need to have the newline=''
+    f = open('all_data_w_city_names.csv', 'w', newline='')
     writer = csv.writer(f)
     writer.writerow(LABELS)
     for key in full_data:
-        data = [key.split(',')[0], key.split(',')[1]]
+        data = [d_one_hot[key.split(',')[0]], key.split(',')[1]]
         for value in full_data[key]:
             data.append(value)
-        assert(len(data) == len(LABELS))
+        assert (len(data) == len(LABELS))
         writer.writerow(data)
     f.close()
 
