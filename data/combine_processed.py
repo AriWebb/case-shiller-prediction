@@ -1,7 +1,7 @@
 import csv
 
 LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
-          'case_shiller', 'label', 'dow', 'nasdaq', 'sp']
+          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
 
 cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
@@ -58,6 +58,11 @@ def main():
                 if row.strip().split(',')[0] == date:
                     full_data[key].append(row.strip().split(',')[1])
                     break
+
+    # Move label to last entry
+    for key in full_data:
+        full_data[key].append(full_data[key].pop(-4))
+
     #Make a dictionary mapping city names to one-hot representations
     #one-hot representations are based on cities list
     d_one_hot = {}
