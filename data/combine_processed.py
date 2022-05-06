@@ -1,12 +1,12 @@
 import csv
 
-LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'case_shiller', 'dow',
-          'nasdaq', 'sp', 'label']
+LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
+          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
 
 def main():
     all_data = {}
     city_files = ['cpi/cpi.csv', 'crime/crime.csv', 'Patents_processed.csv',
-                  'Population_processed.csv', 'Case_Shiller_processed.csv']
+                  'Population_processed.csv', 'unemployment_processed.csv', 'Case_Shiller_processed.csv']
     stock_files = ['Processed_Stock_Data/DOW_processed.csv', 'Processed_Stock_Data/NASDAQ_processed.csv',
                    'Processed_Stock_Data/SP_processed.csv']
 
