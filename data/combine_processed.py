@@ -65,8 +65,8 @@ def main():
     #Make a dictionary mapping city names to one-hot representations
     #one-hot representations are based on cities list
     d_one_hot = {}
-    one = '1,'
-    zero = '0,'
+    one = '1'
+    zero = '0'
     for i in range(len(cities)):
         cur = []
         for j in range(len(cities)):
@@ -81,10 +81,13 @@ def main():
     writer = csv.writer(f)
     writer.writerow(LABELS)
     for key in full_data:
-        data = [d_one_hot[key.split(',')[0]], key.split(',')[1]]
+        data = []
+        for i in d_one_hot[key.split(',')[0]]:
+            data.append(i)
+        data.append(key.split(',')[1])
         for value in full_data[key]:
             data.append(value)
-        assert (len(data) == len(LABELS))
+        #assert (len(data) == len(LABELS))
         writer.writerow(data)
     f.close()
 
