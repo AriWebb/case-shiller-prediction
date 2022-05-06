@@ -1,5 +1,8 @@
 import csv
 
+LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'case_shiller', 'dow',
+          'nasdaq', 'sp']
+
 def main():
     all_data = {}
     city_files = ['cpi/cpi.csv', 'crime/crime.csv', 'Patents_processed.csv',
@@ -34,10 +37,12 @@ def main():
                     break
     f = open('all_data_w_city_names.csv', 'w')
     writer = csv.writer(f)
+    writer.writerow(LABELS)
     for key in full_data:
         data = [key.split(',')[0], key.split(',')[1]]
         for value in full_data[key]:
             data.append(value)
+        assert(len(data) == len(LABELS))
         writer.writerow(data)
     f.close()
 
