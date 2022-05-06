@@ -6,9 +6,9 @@ def main():
     writer = csv.writer(f)
     files = ['atlanta_bi.csv', 'atlanta_monthly.csv', 'atlanta_semi.csv', 'boston_bi.csv', 'chicago_monthly.csv',
              'cleveland_bi.csv', 'dallas_bi.csv', 'dc_bi.csv', 'denver_semi.csv', 'detroit_bi.csv', 'la_monthly.csv',
-             'miami_bi.csv', 'minneapolis_semi.csv', 'nyc_monthly.csv', 'phoenix_semi.csv', 'portland_semi.csv',
-             'seattle_bi.csv', 'seattle_semi.csv', 'seattle_monthly.csv', 'sf_bi.csv', 'tampa_semi.csv',
-             'tampa_annual.csv', 'tampa_monthly.csv']
+             'miami_bi_1.csv', 'miami_bi_2.csv', 'minneapolis_semi.csv', 'nyc_monthly.csv', 'phoenix_semi.csv',
+             'portland_semi.csv', 'seattle_bi.csv', 'seattle_semi.csv', 'seattle_monthly.csv', 'sf_bi.csv',
+             'tampa_semi.csv', 'tampa_annual.csv', 'tampa_monthly.csv']
     cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
               'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
     city_starts = ['01-91', '01-90', '01-90', '01-90', '01-00', '01-90', '01-91', '01-90', '01-90', '01-90', '01-87',
@@ -35,6 +35,7 @@ def main():
                         elif row.split(',')[1].strip() != '.':
                             cur_num = float(row.split(',')[1].strip())
                             mid_cpi = (last_num + cur_num) / 2
+
                             writer.writerow([city, mid_date, mid_cpi])
                             writer.writerow([city, date, cur_num])
                             last_num = cur_num
