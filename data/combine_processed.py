@@ -1,7 +1,7 @@
 import csv
 
 LABELS = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
-          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
+          'case_shiller', 'label', 'dow', 'nasdaq', 'sp']
 
 cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
@@ -45,7 +45,7 @@ def main():
             future_year_str = str(future_year_int)
         future_date = future_month_str + future_year_str
         # If we have the label and all the features
-        future_key = city + ',' + future_date
+        future_key = city + ',' + future_date  # Date five years in the future
         if future_key in case_shiller_dict.keys() and len(all_data[key]) == num_features:
             full_data[key] = all_data[key]
             full_data[key].append(case_shiller_dict[future_key])
