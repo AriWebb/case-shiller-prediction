@@ -3,9 +3,6 @@ import csv
 cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
-LABELS_CITY = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
-          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
-
 LABELS = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
           'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
@@ -84,6 +81,7 @@ def main():
             else:
                 cur += zero
         d_one_hot[cities[i]] = cur
+
     # Write to csv
     #for windows I need to have the newline=''
     f = open('all_data_w_city_names.csv', 'w', newline='')
