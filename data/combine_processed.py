@@ -3,8 +3,15 @@ import csv
 cities = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
+LABELS_CITY = ['city', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
+          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
+
 LABELS = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc', 'date', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
+          'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
+
+LABELS_NO_DATE = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
+          'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc', 'cpi', 'crimes_reported', 'crimes_cleared', 'patents', 'population', 'unemployment',
           'case_shiller', 'dow', 'nasdaq', 'sp', 'label']
 
 
@@ -90,6 +97,20 @@ def main():
         for value in full_data[key]:
             data.append(value)
         #assert (len(data) == len(LABELS))
+        writer.writerow(data)
+    f.close()
+
+    f = open('all_data_w_city_names_no_date.csv', 'w', newline='')
+    writer = csv.writer(f)
+    writer.writerow(LABELS_NO_DATE)
+    for key in full_data:
+        data = []
+        for i in d_one_hot[key.split(',')[0]]:
+            data.append(i)
+
+        for value in full_data[key]:
+            data.append(value)
+        #assert (len(data) == len(LABELS_NO_DATE))
         writer.writerow(data)
     f.close()
 
