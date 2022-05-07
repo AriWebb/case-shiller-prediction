@@ -108,7 +108,7 @@ def main():
 
         for value in full_data[key]:
             data.append(value)
-        #assert (len(data) == len(LABELS_NO_DATE))
+        assert (len(data) == len(LABELS_NO_DATE))
         writer.writerow(data)
     f.close()
 
