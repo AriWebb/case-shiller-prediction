@@ -45,7 +45,7 @@ def main():
                 date = str(l) + '-' + year[2:].strip()
                 if l < 10:
                     date = '0' + date
-                datapoint = [city, date, reported, cleared]
+                datapoint = [city, date, reported]
                 writer.writerow(datapoint)
     f.close()
 
