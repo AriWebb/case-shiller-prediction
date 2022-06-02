@@ -38,7 +38,7 @@ def main():
                     all_data[key].append(value)
 
     # Keep examples with all features and label
-    num_features = max([len(lst)] for lst in all_data.values())[0]
+    num_features = max([len(lst) for lst in all_data.values()])
     full_data = {}  # Dictionary with data points that have all features
     for key in all_data:
         city = key.split(',')[0]
