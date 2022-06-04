@@ -23,8 +23,6 @@ def compile_data(full_data, months_in_feature=12, months_ahead_predict=12, num_c
             labels = np.append(labels, val)
     data = np.delete(data, 0, axis=0)
     labels.shape = (len(labels),)
-    print(data)
-    print(labels)
 
     # Generate random selection of rows to split dataset
     num_train = int(len(labels))
@@ -52,7 +50,8 @@ def linreg(train_data, train_labels, val_data, val_labels):
 
 def main():
     train_data, train_labels, val_data, val_labels = compile_data("FINAL_all_data_one_hot.csv")
-    print(linreg(train_data, train_labels, val_data, val_labels))
+    err1 = linreg(train_data, train_labels, val_data, val_labels)
+    print(np.mean(err1))
 
 
 if __name__ == '__main__':
