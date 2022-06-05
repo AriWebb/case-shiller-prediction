@@ -143,7 +143,7 @@ def NN(data, labels):
     for model_name, model in models:
         print('============================================\n' + model_name)
         model.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanAbsolutePercentageError()])
-        model.fit(train_feat, train_labels, batch_size = 32, epochs = 20, validation_data = (val_feat, val_labels),
+        model.fit(train_feat, train_labels, batch_size = 32, epochs = 50, validation_data = (val_feat, val_labels),
                         callbacks = [early_stop])
         model.evaluate(test_feat, test_labels, verbose = 2)
         print('============================================')
