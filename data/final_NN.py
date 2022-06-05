@@ -36,11 +36,19 @@ def gen_data(data, labels):
     dataset = np.loadtxt(data, delimiter=',')
     labels = np.loadtxt(labels, delimiter=',')
     examples, indices = num_features(data)
-    train_feat = 0
-    train_label = 0
+    train_feat = np.array((0, dataset.shape[0]))
+    train_label = np.array()
+    val_feat = np.array((0, dataset.shape[0]))
+    val_label = np.array()
+    test_feat = np.array((0, dataset.shape[0]))
+    test_label = np.array()
 
     for city in CITIES:
-        t = 0
+        val = int(0.9 * examples[city])
+        test = examples[city] - val
+
+        train_feat.append(dataset[indices[city][0]:indices[city][0] + ])
+        train_label.append(labels[indices[city][0]:indices[city][0] + ])
 
     #return train_feat, train_label, val_feat, val_label, test_feat, test_label
 
@@ -185,6 +193,7 @@ def NN(data, labels):
     loss_fn = tf.keras.losses.MeanSquaredError()
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=5,
                                                   restore_best_weights=True)
+
     for model_name, model in models:
         print('============================================\n' + model_name)
         model.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanAbsolutePercentageError()])
