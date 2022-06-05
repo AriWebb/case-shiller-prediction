@@ -36,27 +36,37 @@ def gen_data(data, labels):
     dataset = np.loadtxt(data, delimiter=',')
     labels = np.loadtxt(labels, delimiter=',')
     examples, indices = num_features(data)
-    train_feat = np.array((0, dataset.shape[0]))
-    train_label = np.array()
-    val_feat = np.array((0, dataset.shape[0]))
-    val_label = np.array()
-    test_feat = np.array((0, dataset.shape[0]))
-    test_label = np.array()
+    train_feat = list()
+    train_labels = list()
+    val_feat = list()
+    val_labels = list()
+    test_feat = list()
+    test_labels = list()
 
     for city in CITIES:
         val = int(0.9 * examples[city])
-        test = examples[city] - val
+        train = int(0.75 * examples[city])
 
-        train_feat.append(dataset[indices[city][0]:indices[city][0] + ])
-        train_label.append(labels[indices[city][0]:indices[city][0] + ])
+        train_feat += list(dataset[indices[city][0] : indices[city][0] + train])
+        train_labels += list(labels[indices[city][0] : indices[city][0] + train])
+        val_feat += list(dataset[indices[city][0] + train : indices[city][0] + val])
+        val_labels += list(labels[indices[city][0] + train : indices[city][0] + val])
+        test_feat += list(dataset[indices[city][0] + val : indices[city][1] + 1])
+        test_labels += list(labels[indices[city][0] + val: indices[city][1] + 1])
 
-    #return train_feat, train_label, val_feat, val_label, test_feat, test_label
+    train_feat = np.array(train_feat)
+    train_labels = np.array(train_labels)
+    val_feat = np.array(val_feat)
+    val_labels = np.array(val_labels)
+    test_feat = np.array(test_feat)
+    test_labels = np.array(test_labels)
+
+    return train_feat, train_labels, val_feat, val_labels, test_feat, test_labels
 
 def NN(data, labels):
     mnist = tf.keras.datasets.mnist
 
-    data = np.loadtxt(data, delimiter=',')
-    labels = np.loadtxt(labels, delimiter=',')
+    train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data(data, labels)
 
     model_1relu = tf.keras.models.Sequential([
              tf.keras.layers.Flatten(input_shape = data.shape[1]),
@@ -197,14 +207,14 @@ def NN(data, labels):
     for model_name, model in models:
         print('============================================\n' + model_name)
         model.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanAbsolutePercentageError()])
-        model.fit(x_train, y_train, batch_size = 32, epochs = 20, validation_data = (x_val, y_val),
+        model.fit(train_feat, train_labels, batch_size = 32, epochs = 20, validation_data = (val_feat, val_labels),
                         callbacks = [early_stop])
-        model.evaluate(x_test,  y_test, verbose = 2)
+        model.evaluate(test_feat, test_feat, verbose = 2)
         print('============================================')
 
 def main():
     print("Hello")
 
 if __name__ == "__main__":
-    print(num_features("one_hot_12feature_12predict.csv"))
+    gen_data("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
     #NN("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
