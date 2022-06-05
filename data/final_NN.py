@@ -4,6 +4,9 @@ import numpy as np
 CITIES = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
+def test():
+    data = np.loadtxt("labels_12feature_12predict.csv", delimiter=',')
+    print(data[0])
 
 def weighted_mean_squared(y_actual, y_pred):
     """
@@ -28,6 +31,18 @@ def num_features(data):
         total += int(np.sum(data[:, i]))
 
     return result, indices
+
+def gen_data(data, labels):
+    dataset = np.loadtxt(data, delimiter=',')
+    labels = np.loadtxt(labels, delimiter=',')
+    examples, indices = num_features(data)
+    train_feat = 0
+    train_label = 0
+
+    for city in CITIES:
+        t = 0
+
+    #return train_feat, train_label, val_feat, val_label, test_feat, test_label
 
 def NN(data, labels):
     mnist = tf.keras.datasets.mnist
