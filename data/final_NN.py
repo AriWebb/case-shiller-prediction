@@ -162,17 +162,21 @@ def NN(data, labels):
              tf.keras.layers.Dense(128, activation = tf.keras.layers.LeakyReLU(alpha = 0.01)),
              tf.keras.layers.Dense(1)
              ])
-    
+
+    models = [("model_1relu", model_1relu), ("model_3relu", model_3relu), ("model_5relu", model_5relu),
+              ("model_10relu", model_10relu), ("model_20relu", model_20relu),
+              ("model_1Lrelu", model_1Lrelu), ("model_3Lrelu", model_3Lrelu), ("model_5Lrelu", model_5Lrelu),
+              ("model_10Lrelu", model_10Lrelu), ("model_20Lrelu", model_20Lrelu)]
     loss_fn = tf.keras.losses.MeanSquaredError()
-
-    model_1relu.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanAbsolutePercentageError()])
-
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'val_loss', mode = 'min', patience = 5,
-                                                  restore_best_weights = True)
-    model_1relu.fit(x_train, y_train, batch_size = 32, epochs = 20, validation_data = (x_val, y_val),
-                    callbacks = [early_stop])
-
-    model_1relu.evaluate(x_test,  y_test, verbose = 2)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=5,
+                                                  restore_best_weights=True)
+    for model_name, model in models:
+        print('============================================\n' + model_name)
+        model.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanAbsolutePercentageError()])
+        model.fit(x_train, y_train, batch_size = 32, epochs = 20, validation_data = (x_val, y_val),
+                        callbacks = [early_stop])
+        model.evaluate(x_test,  y_test, verbose = 2)
+        print('============================================')
 
 def main():
     print("Hello")
