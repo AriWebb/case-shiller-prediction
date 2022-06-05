@@ -167,7 +167,11 @@ def NN(data, labels):
 
     model_1relu.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanAbsolutePercentageError()])
 
-    model_1relu.fit(x_train, y_train, epochs = 5)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'val_loss', mode = 'min', patience = 5,
+                                                  restore_best_weights = True)
+    model_1relu.fit(x_train, y_train, batch_size = 32, epochs = 20, validation_data = (x_val, y_val),
+                    callbacks = [early_stop])
+
     model_1relu.evaluate(x_test,  y_test, verbose = 2)
 
 def main():
