@@ -4,6 +4,18 @@ import numpy as np
 CITIES = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
+
+def weighted_mean_squared(y_actual, y_pred):
+    """
+    A mean squared error loss function that penalizes over-predictions more than
+    under under-predictions.
+    """
+    if y_actual < y_pred:
+        loss = tf.keras.backend.square((y_actual - y_pred) * 1.1)
+    else:
+        loss = tf.keras.backend.square(y_actual - y_pred)
+    return loss
+
 def num_features(data):
     data = np.loadtxt(data, delimiter=',')
     result = {}
