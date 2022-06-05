@@ -1,22 +1,31 @@
 import tensorflow as tf
+import numpy as np
 
-def NN():
+CITIES = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
+          'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
+
+def num_features(data):
+    data = np.loadtxt(data, delimiter=',')
+    result = {}
+
+    for i in range(len(CITIES)):
+        result[CITIES[i]] = int(np.sum(data[:, i]))
+
+    return result
+
+def NN(data, labels):
     mnist = tf.keras.datasets.mnist
 
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train, x_test = x_train / 255.0, x_test / 255.0
+    data = np.loadtxt(data, delimiter=',')
+    labels = np.loadtxt(labels, delimiter=',')
 
     model = tf.keras.models.Sequential([
-            tf.keras.layers.Flatten(input_shape = (28, 28)),
+            tf.keras.layers.Flatten(input_shape = data.shape[1]),
             tf.keras.layers.Dense(128, activation='relu'),
             tf.keras.layers.Dense(1)
     ])
 
-    predictions = model(x_train[:1]).numpy()
-    tf.nn.softmax(predictions).numpy()
-
-    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    print(loss_fn(y_train[:1], predictions).numpy())
+    loss_fn = 0
 
     model.compile(optimizer='adam',
                 loss=loss_fn,
@@ -29,4 +38,5 @@ def main():
     print("Hello")
 
 if __name__ == "__main__":
-    NN()
+    print(num_features("one_hot_12feature_12predict.csv"))
+    #NN("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
