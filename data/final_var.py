@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython.display import display
+import dataframe_image as dfi
 
 # Import Statsmodels
 from statsmodels.tsa.api import VAR
@@ -17,7 +18,8 @@ https://www.machinelearningplus.com/time-series/vector-autoregression-examples-p
 '''
 
 maxlag = 12
-test = 'ssr_chi2test'
+CITIES = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
+          'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
 
 def grangers_causation_matrix(data, variables, test='ssr_chi2test', verbose=False):
@@ -44,32 +46,46 @@ def grangers_causation_matrix(data, variables, test='ssr_chi2test', verbose=Fals
     return df
 
 
-def make_plots(df):
+def adf_test(series, name, verbose, min=.05):
+    """Performs ADFuller test to see if time series is stationary.
+    Data needs to be stationary to do VAR.
+    Args:
+        time series of one variable
+    Returns:
+        True if data is stationary, False otherwise
+    """
+    m = adfuller(series, autolag="AIC")
+    p = m[1]
+    if verbose:
+        print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
+    if p <= min:
+        if verbose:
+            print(f"P-Value = {p}. Series is Stationary")
+        return True
+    else:
+        if verbose:
+            print(f"P-Value = {p}. Series is Non-Stationary")
+        return False
+
+
+def make_plot(frame, path):
     """Makes plots of all data for each city and puts them in ./plots folder
     Args:
         pandas dataframe
     Returns:
         none
     """
-    cities = set()
-    for i in df['city'].values:
-        cities.add(i)
-    for city in cities:
-        frame = df[df['city'] == city]
-        frame = frame.drop(['city'], axis=1)
-        # Plot
-        fig, axes = plt.subplots(nrows=4, ncols=3, dpi=120, figsize=(10, 6))
-        for i, ax in enumerate(axes.flatten()):
-            data = frame[frame.columns[i]]
-            ax.plot(data, color='red', linewidth=1)
-            # Decorations
-            ax.set_title(frame.columns[i])
-            ax.spines["top"].set_alpha(0)
-            ax.tick_params(labelsize=6)
-
-        plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right')
-        plt.tight_layout()
-        plt.savefig('./plots' + city)
+    # Plot
+    fig, axes = plt.subplots(nrows=4, ncols=3, dpi=120, figsize=(10, 6))
+    for i, ax in enumerate(axes.flatten()):
+        data = frame[frame.columns[i]]
+        ax.plot(data, color='red', linewidth=1)
+        # Decorations
+        ax.set_title(frame.columns[i])
+        ax.spines["top"].set_alpha(0)
+        ax.tick_params(labelsize=6)
+    plt.tight_layout()
+    plt.savefig(path)
 
 
 def format_data(data_path):
@@ -92,14 +108,57 @@ def format_data(data_path):
     return df
 
 
+def split_data(frame, n=12):
+    """Splits data into test and train.
+    Args:
+        frame to split
+        number of time periods in train
+    Returns:
+        train frame
+        test frame
+    """
+    frame_train, frame_test = frame[0:-n], frame[-n:]
+    return frame_train, frame_test
+
+
 def main():
-    #first, format the data
+    # first, format the data
     df = format_data("FINAL_all_data_city_names.csv")
-    # then, make plots to visualize data.
-    # make_plots(df)
-    # grangers causation, see function description
-    c_matrix = grangers_causation_matrix(df, variables=df.columns)
-    display(c_matrix)
+    for city in CITIES:
+        frame = df[df['city'] == city]
+        frame = frame.drop(['city'], axis=1)
+        # then, make plot to visualize data.
+        path = './plots' + "/" + city
+        # make_plot(frame, path)
+        # grangers causation, see function description
+        # c_matrix = grangers_causation_matrix(frame, variables=frame.columns)
+        # dfi.export(c_matrix, "./causation_matricies" + "/" + city + ".png")
+        #split data into test and train
+        frame_train, frame_test = split_data(frame)
+        #test for data being stationary and diffs until it is stationary
+        print(city)
+        st = False
+        iter = 0
+        while not st:
+            cur = True
+            for n, c in frame_train.iteritems():
+                cur_st = adf_test(c, c.name, False)
+                if not cur_st:
+                    cur = False
+            st = cur
+            frame_train = frame_train.diff().dropna()
+            iter += 1
+        print(iter)
+        make_plot(frame_train, "./diffed.png")
+        # run VAR model
+        print(frame_train)
+        model = VAR(frame_train)
+        return
+
+
+
+
+
 
 
 if __name__ == '__main__':
