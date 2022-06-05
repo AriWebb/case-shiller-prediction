@@ -63,79 +63,33 @@ def gen_data(data, labels):
 
     return train_feat, train_labels, val_feat, val_labels, test_feat, test_labels
 
+
+def relu_layer_list(num_hidden_layers, num_neurons, input_shape):
+    layers = [tf.keras.layers.Flatten(input_shape = (input_shape,))]
+    for i in range(num_hidden_layers):
+        layers.append(tf.keras.layers.Dense(num_neurons, activation = 'relu'))
+    layers.append(tf.keras.layers.Dense(1))
+    return layers
+
+
 def NN(data, labels):
     mnist = tf.keras.datasets.mnist
 
     train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data(data, labels)
 
-    model_1relu = tf.keras.models.Sequential([
-             tf.keras.layers.Flatten(input_shape = (train_feat.shape[1],)),
-             tf.keras.layers.Dense(80, activation = 'relu'), #tf.keras.layers.Dense(n_units, activation = tf.keras.layers.LeakyReLU(alpha = 0.01))
-             tf.keras.layers.Dense(1)
-             ])
-
-    model_3relu = tf.keras.models.Sequential([
-             tf.keras.layers.Flatten(input_shape = (train_feat.shape[1],)),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(1)
-             ])
-
-    model_5relu = tf.keras.models.Sequential([
-             tf.keras.layers.Flatten(input_shape = (train_feat.shape[1],)),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(1)
-             ])
-
-    model_10relu = tf.keras.models.Sequential([
-             tf.keras.layers.Flatten(input_shape = (train_feat.shape[1],)),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(1)
-             ])
-
-    model_20relu = tf.keras.models.Sequential([
-             tf.keras.layers.Flatten(input_shape = (train_feat.shape[1],)),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(80, activation = 'relu'),
-             tf.keras.layers.Dense(1)
-             ])
+    model_1relu = tf.keras.models.Sequential(relu_layer_list(1, 80, train_feat.shape[1]))
+    model_3relu = tf.keras.models.Sequential(relu_layer_list(3, 80, train_feat.shape[1]))
+    model_5relu = tf.keras.models.Sequential(relu_layer_list(5, 80, train_feat.shape[1]))
+    model_10relu = tf.keras.models.Sequential(relu_layer_list(10, 80, train_feat.shape[1]))
+    model_20relu = tf.keras.models.Sequential(relu_layer_list(20, 80, train_feat.shape[1]))
+    model_50relu = tf.keras.models.Sequential(relu_layer_list(50, 80, train_feat.shape[1]))
+    model_100relu = tf.keras.models.Sequential(relu_layer_list(100, 80, train_feat.shape[1]))
 
     # tf.keras.layers.Dense(80, activation = tf.keras.layers.LeakyReLU(alpha = 0.01))
 
     models = [("model_1relu", model_1relu), ("model_3relu", model_3relu), ("model_5relu", model_5relu),
-              ("model_10relu", model_10relu), ("model_20relu", model_20relu),]
+              ("model_10relu", model_10relu), ("model_20relu", model_20relu), ("model_50relu", model_50relu),
+              ("model_100relu", model_100relu)]
     loss_fn = tf.keras.losses.MeanSquaredError()
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=5,
                                                   restore_best_weights=True)
