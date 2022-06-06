@@ -59,10 +59,12 @@ def num_features(data):
 
     return result, indices
 
-def gen_data(data, labels, silly = False):
+def gen_data(data, label, silly = False):
     dataset = np.loadtxt(data, delimiter=',')
-    labels = np.loadtxt(labels, delimiter=',')
+    labels = np.loadtxt(label, delimiter=',')
     examples, indices = num_features(data)
+    num_months = int(label[label.index("_") + 1:label.index("feature")])
+
     train_feat = list()
     train_labels = list()
     val_feat = list()
@@ -100,7 +102,7 @@ def gen_data(data, labels, silly = False):
 
         city_ind = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
-        for i in range(11):
+        for i in range(num_months - 1):
             nas_ind.append(nas_ind[-1] - 15)
             sp_ind.append(sp_ind[-1] - 15)
             dow_ind.append(dow_ind[-1] - 15)
@@ -118,16 +120,16 @@ def gen_data(data, labels, silly = False):
             cpi_ind.append(cpi_ind[-1] - 15)
 
         for i in range(len(train_feat)):
-            train_feat[i] = np.concatenate((train_feat[i][dow_ind], train_feat[i][cs_ind])) #train_feat[i][cs_ind] #
+            train_feat[i] = train_feat[i][cs_ind] #np.concatenate((train_feat[i][dow_ind], train_feat[i][cs_ind], train_feat[i][inc_ind])) #
 
         for i in range(len(val_feat)):
-            val_feat[i] = np.concatenate((val_feat[i][dow_ind], val_feat[i][cs_ind])) #val_feat[i][cs_ind] #
+            val_feat[i] = val_feat[i][cs_ind] #np.concatenate((val_feat[i][dow_ind], val_feat[i][cs_ind], val_feat[i][inc_ind])) #
 
         for i in range(len(test_feat)):
             test_feat[i] = np.concatenate((test_feat[i][dow_ind], test_feat[i][cs_ind])) #test_feat[i][cs_ind] #
 
     
-    print(len(train_feat[0]))
+    #print(len(train_feat[0]))
 
     train_feat = np.array(train_feat)
     train_labels = np.array(train_labels)
