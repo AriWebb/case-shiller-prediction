@@ -1,4 +1,3 @@
-from re import M
 import tensorflow as tf
 import numpy as np
 import scipy.stats as sts
@@ -19,8 +18,7 @@ def test():
 
     # (1.088888888888889, 5.373319498591078)
 
-    cs = val_feat[:, -6]
-    pearson = np.zeros(161)
+    cs_rec = val_feat[:, -6]
 
     label_names = CITIES
     for i in range(1, 13):
@@ -28,24 +26,25 @@ def test():
             add = lab + "_" + str(i).zfill(2)
             label_names.append(add)
 
-    for i in range(161):
-        pearson[i], dump = sts.pearsonr(train_feat[:, i], train_labels)
-
-    ap = np.abs(pearson)
-    ind = np.argpartition(ap, -50)[-50:]
-    ind = ind[np.argsort(-ap[ind])]
-
-    #for i in range(50):
-        #print(label_names[ind[i]], ": ", pearson[ind[i]], "\n\n")
-
     df = pd.DataFrame(np.c_[train_feat, train_labels.reshape(-1, 1)], columns = label_names + ["Prediction"])
     #print(df.corr(method = "pearson")["Prediction"][:].sort_values(ascending = False, key=abs).head(20), "\n\n\n")
     #print(df.corr(method = "spearman")["Prediction"][:].sort_values(ascending = False, key=abs).head(50))
-    print(df.corr(method = "kendall")["Prediction"][:].sort_values(ascending = False, key=abs).head(50))
+    #print(df.corr(method = "kendall")["Prediction"][:].sort_values(ascending = False, key=abs).head(50))
 
+    with open('NN_top1.json') as json_file:
+        NN_data = json.load(json_file)
 
+    NN_list = list()
+    for key in NN_data.keys():
+        NN_list.append([key, NN_data[key]])
     
-    
+    MAPE = np.array([row[1] for row in NN_list])
+    ind = np.argpartition(MAPE, 20)[:20]
+    ind = ind[np.argsort(MAPE[ind])]
+
+    for i in ind:
+        print(NN_list[i])
+
 
 def num_features(data):
     data = np.loadtxt(data, delimiter=',')
@@ -118,8 +117,8 @@ def gen_data(data, labels, silly = False):
         for i in range(len(val_feat)):
             val_feat[i] = val_feat[i][cs_ind] #np.concatenate((val_feat[i][inc_ind], val_feat[i][cs_ind]))
 
-        #for i in range(len(test_feat)):
-            #test_feat[i] = np.concat((test_feat[i][cpi_ind], test_feat[i][cs_ind]))
+        for i in range(len(test_feat)):
+            test_feat[i] = test_feat[i][cs_ind] #np.concatenate((test_feat[i][cpi_ind], test_feat[i][cs_ind]))
 
         print(len(train_feat[0]))
 
@@ -140,8 +139,7 @@ def relu_layer_list(num_hidden_layers, num_neurons, input_shape, act):
     layers.append(tf.keras.layers.Dense(1))
     return layers
 
-
-def NN(data, labels):
+def NN_tests(data, labels):
     train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data(data, labels, True)
     
     adam = tf.keras.optimizers.Adam()
@@ -152,8 +150,8 @@ def NN(data, labels):
     rms = tf.keras.optimizers.RMSprop()
 
     optimizers = [(adam, "Adam"), (nadam, "Nadam"), (adamax, "Adamax"), (adadelta, "Adadelta"), (sgd, "SGD"), (rms, "RMSprop")]
-    batch_sizes = [4, 8, 16, 32, 64]
-    layers = [1, 2, 5, 10, 15]
+    batch_sizes = [16, 32, 64]
+    layers = [1, 2, 5, 10]
     neurons = [3, 6, 12, 24]
     activations = [("relu", "relu"), ("Lrelu", tf.keras.layers.LeakyReLU())]
 
@@ -162,6 +160,8 @@ def NN(data, labels):
     loss_fn = tf.keras.losses.MeanAbsolutePercentageError()
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=10,
                                                   restore_best_weights=True)
+
+    # Hyperparameter Optimization
 
     for opt, opt_name in optimizers:
         for batch in batch_sizes:
@@ -176,7 +176,7 @@ def NN(data, labels):
 
                         model.compile(optimizer = opt, loss = loss_fn, metrics = [tf.keras.metrics.MeanSquaredError()])
                         model.fit(train_feat, train_labels, batch_size = batch, epochs = 50, validation_data = (val_feat, val_labels),
-                                callbacks = [early_stop], verbose = 3)
+                                callbacks = [early_stop], verbose = 0, steps_per_epoch = train_feat.shape[0] // (10 * batch), shuffle = True)
 
                         evaluation[model_name] = model.evaluate(val_feat, val_labels, verbose = 2)
 
@@ -185,10 +185,29 @@ def NN(data, labels):
     with open('NN.json', 'w') as fp:
         json.dump(evaluation, fp, indent = 6)
 
+def NN():
+    train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data("one_hot_12feature_12predict.csv",\
+                                                                                      "labels_12feature_12predict.csv", True)
+
+    loss_fn = tf.keras.losses.MeanAbsolutePercentageError()
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=20,
+                                                  restore_best_weights=True)
+
+    model = tf.keras.models.Sequential(relu_layer_list(3, 24, train_feat.shape[1], tf.keras.layers.LeakyReLU()))
+
+    model.compile(optimizer = "adam", loss = loss_fn, metrics = [tf.keras.metrics.MeanSquaredError()])
+    
+    for i in range(10):
+        print(i)
+        model.fit(train_feat, train_labels, batch_size = 16, epochs = 100, validation_data = (val_feat, val_labels),
+              callbacks = [early_stop], verbose = 0, shuffle = True)
+
+    model.evaluate(test_feat, test_labels, verbose = 2)
+
 def main():
     print("Hello")
 
 if __name__ == "__main__":
     #test()
     #gen_data("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
-    NN("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
+    NN()
