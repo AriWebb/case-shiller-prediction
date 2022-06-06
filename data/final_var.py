@@ -127,21 +127,26 @@ def diff_data(frame_train, verbose=False):
     return frame_diff
 
 
-def make_full_plot(frame, path):
+def make_full_plot(frame, path, color="blue"):
     """Makes plots of all data for each city
     Args:
         frame: pandas dataframe
         path: where to output the plot
+        color: what color the graph is
     Returns:
         none
     """
     fig, axes = plt.subplots(nrows=4, ncols=3, dpi=120, figsize=(10, 6))
     for i, ax in enumerate(axes.flatten()):
         data = frame[frame.columns[i]]
-        ax.plot(data, color='blue', linewidth=1)
+        ax.plot(data, color=color, linewidth=1)
         ax.set_title(frame.columns[i])
         ax.spines["top"].set_alpha(0)
         ax.tick_params(labelsize=6)
+        xticks = ax.xaxis.get_major_ticks()
+        for i in range(len(xticks)):
+            if i % 48 != 0:
+                xticks[i].set_visible(False)
     plt.tight_layout()
     plt.savefig(path)
     plt.close()
@@ -161,8 +166,8 @@ def make_forecast_plot(frame, frame_test, forecasted, city, n=12):
     # plot actuals vs predicted
     fig, axes = plt.subplots(nrows=int(len(frame.columns) / 2), ncols=2, dpi=150, figsize=(10, 10))
     for i, (col, ax) in enumerate(zip(frame.columns, axes.flatten())):
-        forecasted[col + '_forecast'].plot(legend=True, ax=ax).autoscale(axis='x', tight=True)
-        frame_test[col][-n:].plot(legend=True, ax=ax);
+        forecasted[col + '_forecast'].plot(legend=True, ax=ax, color='red').autoscale(axis='x', tight=True)
+        frame_test[col][-n:].plot(legend=True, ax=ax, color='blue')
         ax.xaxis.set_ticks_position('none')
         ax.yaxis.set_ticks_position('none')
         ax.spines["top"].set_alpha(0)
@@ -204,12 +209,13 @@ def split_data(frame, n=12):
     return frame_train, frame_test
 
 
-def full_model(frame, city, forecast_plot=False, n=12):
+def full_model(frame, city, diff_plot=False, forecast_plot=False, n=12):
     """Runs the full model.
     Args:
         frame: data frame to use
         city: city we are operating on
-        forecast_plot: set to true to make plots of forecasted values vs test data
+        diff_plot: set to to True to make plots of diffed data
+        forecast_plot: set to True to make plots of forecasted values vs test data
         n: number of months to use as test
     Returns:
         forecasted values for last n months
@@ -222,7 +228,8 @@ def full_model(frame, city, forecast_plot=False, n=12):
     # test for data being stationary and diff twice so data is stationary
     frame_diff = diff_data(frame_train)
     # plot diffed data for visualization
-    # make_full_plot(frame_diff, "./diffed" + "/" + city + ".png")
+    if diff_plot:
+        make_full_plot(frame_diff, "./diffed" + "/" + city + ".png", 'green')
     # run VAR model on data
     forecasted = run_VAR(frame, frame_train, frame_diff)
     # plot forecasted vs actual
@@ -257,8 +264,8 @@ def main():
         # make plot to visualize data.
         # make_full_plot(frame, './plots' + "/" + city)
         # run model
-        # full_model(frame, city, forecast_plot=True)
-    print(find_mean_error(df))
+        full_model(frame, city, diff_plot=True, forecast_plot=True)
+    # print(find_mean_error(df))
 
 
 
