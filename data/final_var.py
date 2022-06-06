@@ -12,10 +12,7 @@ from statsmodels.tsa.stattools import grangercausalitytests
 from statsmodels.tsa.base.datetools import dates_from_str
 
 '''
-Vector Autoregression Analysis.
-
-Implementation uses info from:
-https://www.machinelearningplus.com/time-series/vector-autoregression-examples-python/
+Vector Autoregression Analysis interface
 '''
 
 maxlag = 12
