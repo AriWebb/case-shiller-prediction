@@ -1,7 +1,9 @@
+from re import M
 import tensorflow as tf
 import numpy as np
 import scipy.stats as sts
 import pandas as pd
+import json
 
 CITIES = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detroit', 'la', 'miami',
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
@@ -131,65 +133,57 @@ def gen_data(data, labels, silly = False):
     return train_feat, train_labels, val_feat, val_labels, test_feat, test_labels
 
 
-def relu_layer_list(num_hidden_layers, num_neurons, input_shape):
+def relu_layer_list(num_hidden_layers, num_neurons, input_shape, act):
     layers = [tf.keras.layers.Flatten(input_shape = (input_shape,))]
     for i in range(num_hidden_layers):
-        layers.append(tf.keras.layers.Dense(num_neurons, activation = 'relu'))
+        layers.append(tf.keras.layers.Dense(num_neurons, activation = act))
     layers.append(tf.keras.layers.Dense(1))
     return layers
 
 
 def NN(data, labels):
-    mnist = tf.keras.datasets.mnist
-
     train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data(data, labels, True)
+    
+    adam = tf.keras.optimizers.Adam()
+    nadam = tf.keras.optimizers.Nadam()
+    adamax = tf.keras.optimizers.Adamax()
+    adadelta = tf.keras.optimizers.Adadelta() # More robust Adagrad
+    sgd = tf.keras.optimizers.SGD()
+    rms = tf.keras.optimizers.RMSprop()
 
-    model_1relu = tf.keras.models.Sequential(relu_layer_list(1, 160, train_feat.shape[1]))
-    model_3relu = tf.keras.models.Sequential(relu_layer_list(3, 160, train_feat.shape[1]))
-    model_5relu = tf.keras.models.Sequential(relu_layer_list(5, 160, train_feat.shape[1]))
-    model_10relu = tf.keras.models.Sequential(relu_layer_list(10, 80, train_feat.shape[1]))
-    model_20relu = tf.keras.models.Sequential(relu_layer_list(20, 160, train_feat.shape[1]))
-    model_50relu = tf.keras.models.Sequential(relu_layer_list(50, 160, train_feat.shape[1]))
-    model_100relu = tf.keras.models.Sequential(relu_layer_list(100, 160, train_feat.shape[1]))
+    optimizers = [(adam, "Adam"), (nadam, "Nadam"), (adamax, "Adamax"), (adadelta, "Adadelta"), (sgd, "SGD"), (rms, "RMSprop")]
+    batch_sizes = [4, 8, 16, 32, 64]
+    layers = [1, 2, 5, 10, 15]
+    neurons = [3, 6, 12, 24]
+    activations = [("relu", "relu"), ("Lrelu", tf.keras.layers.LeakyReLU())]
 
-    # tf.keras.layers.Dense(80, activation = tf.keras.layers.LeakyReLU(alpha = 0.01))
+    evaluation = {}
 
-    models = [("model_1relu", model_1relu), ("model_3relu", model_3relu), ("model_5relu", model_5relu),
-              ("model_10relu", model_10relu), ("model_20relu", model_20relu), ("model_50relu", model_50relu),
-              ("model_100relu", model_100relu)]
     loss_fn = tf.keras.losses.MeanAbsolutePercentageError()
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=10,
                                                   restore_best_weights=True)
 
-    evaluation = {}
+    for opt, opt_name in optimizers:
+        for batch in batch_sizes:
+            for layer in layers:
+                for neu in neurons:
+                    for act_name, act in activations:
+                        model_name = "O = " + opt_name + "; B = " + str(batch) + "; L = " + str(layer) + "; N = " + str(neu) + \
+                                     "; A = " + act_name
+                        print("Starting model: ", model_name)
 
-    # for model_name, model in models:
-    #     print('============================================\n' + model_name)
-    #     model.compile(optimizer = 'adam', loss = loss_fn, metrics = [tf.keras.metrics.MeanSquaredError()])
-    #     model.fit(train_feat, train_labels, batch_size = 5, epochs = 50, validation_data = (val_feat, val_labels),
-    #                     callbacks = [early_stop])
-        
-    #     evaluation[model_name] = model.evaluate(val_feat, val_labels, verbose = 2)
-    #     #evaluation[model_name] = model.evaluate(test_feat, test_labels, verbose = 2)
-    #     print('============================================')
+                        model = tf.keras.models.Sequential(relu_layer_list(layer, neu, train_feat.shape[1], act))
 
-    model = tf.keras.models.Sequential([tf.keras.layers.Flatten(input_shape = (train_feat.shape[1],)),
-                                        tf.keras.layers.Dense(train_feat.shape[1] // 2, activation = 'relu'),
-                                        tf.keras.layers.Dense(train_feat.shape[1] // 2, activation = 'relu'),
-                                        tf.keras.layers.Dense(train_feat.shape[1] // 2, activation = 'relu'),
-                                        tf.keras.layers.Dense(train_feat.shape[1] // 2, activation = 'relu'),
-                                        tf.keras.layers.Dense(train_feat.shape[1] // 2, activation = 'relu'),
-                                        tf.keras.layers.Dense(1)])
+                        model.compile(optimizer = opt, loss = loss_fn, metrics = [tf.keras.metrics.MeanSquaredError()])
+                        model.fit(train_feat, train_labels, batch_size = batch, epochs = 50, validation_data = (val_feat, val_labels),
+                                callbacks = [early_stop], verbose = 3)
 
-    opt = tf.keras.optimizers.Adam()
-
-    model.compile(optimizer = opt, loss = loss_fn, metrics = [tf.keras.metrics.MeanSquaredError()])
-    model.fit(train_feat, train_labels, batch_size = 16, epochs = 100, validation_data = (val_feat, val_labels),
-                    callbacks = [early_stop])
-        
-    evaluation["model"] = model.evaluate(val_feat, val_labels, verbose = 2)
+                        evaluation[model_name] = model.evaluate(val_feat, val_labels, verbose = 2)
 
     print(evaluation)
+
+    with open('NN.json', 'w') as fp:
+        json.dump(evaluation, fp, indent = 6)
 
 def main():
     print("Hello")
