@@ -82,34 +82,40 @@ def gen_data(data, labels, silly = False):
         test_labels += list(labels[indices[city][0] + val: indices[city][1] + 1])
 
     if silly:
-        food_ind = [-1]
-        inc_ind = [-2]
-        motor_ind = [-3]
-        med_ind = [-4]
-        edu_ind = [-5]
-        cs_ind = [-6]
-        unemp_ind = [-7]
-        pop_ind = [-8]
-        pat_ind = [-9]
-        prop_ind = [-10]
-        vio_ind = [-11]
-        cpi_ind = [-12]
+        nas_ind = [-1]
+        sp_ind = [-2]
+        dow_ind = [-3]
+        food_ind = [-4]
+        inc_ind = [-5]
+        motor_ind = [-6]
+        med_ind = [-7]
+        edu_ind = [-8]
+        cs_ind = [-9]
+        unemp_ind = [-10]
+        pop_ind = [-11]
+        pat_ind = [-12]
+        prop_ind = [-13]
+        vio_ind = [-14]
+        cpi_ind = [-15]
 
         city_ind = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
         for i in range(11):
-            food_ind.append(food_ind[-1] - 12)
-            inc_ind.append(inc_ind[-1] - 12)
-            motor_ind.append(motor_ind[-1] - 12)
-            med_ind.append(med_ind[-1] - 12)
-            edu_ind.append(edu_ind[-1] - 12)
-            cs_ind.append(cs_ind[-1] - 12)
-            unemp_ind.append(unemp_ind[-1] - 12)
-            pop_ind.append(pop_ind[-1] - 12)
-            pat_ind.append(pat_ind[-1] - 12)
-            prop_ind.append(prop_ind[-1] - 12)
-            vio_ind.append(vio_ind[-1] - 12)
-            cpi_ind.append(cpi_ind[-1] - 12)
+            nas_ind.append(nas_ind[-1] - 15)
+            sp_ind.append(sp_ind[-1] - 15)
+            dow_ind.append(dow_ind[-1] - 15)
+            food_ind.append(food_ind[-1] - 15)
+            inc_ind.append(inc_ind[-1] - 15)
+            motor_ind.append(motor_ind[-1] - 15)
+            med_ind.append(med_ind[-1] - 15)
+            edu_ind.append(edu_ind[-1] - 15)
+            cs_ind.append(cs_ind[-1] - 15)
+            unemp_ind.append(unemp_ind[-1] - 15)
+            pop_ind.append(pop_ind[-1] - 15)
+            pat_ind.append(pat_ind[-1] - 15)
+            prop_ind.append(prop_ind[-1] - 15)
+            vio_ind.append(vio_ind[-1] - 15)
+            cpi_ind.append(cpi_ind[-1] - 15)
 
         for i in range(len(train_feat)):
             train_feat[i] = train_feat[i][cs_ind] #np.concatenate((train_feat[i][inc_ind], train_feat[i][cs_ind]))
@@ -120,7 +126,8 @@ def gen_data(data, labels, silly = False):
         for i in range(len(test_feat)):
             test_feat[i] = test_feat[i][cs_ind] #np.concatenate((test_feat[i][cpi_ind], test_feat[i][cs_ind]))
 
-        print(len(train_feat[0]))
+    
+    print(len(train_feat[0]))
 
     train_feat = np.array(train_feat)
     train_labels = np.array(train_labels)
@@ -184,6 +191,23 @@ def NN_tests(data, labels):
 
     with open('NN.json', 'w') as fp:
         json.dump(evaluation, fp, indent = 6)
+
+def NN_test():
+    train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data("one_hot_12feature_12predict.csv",\
+                                                                                      "labels_12feature_12predict.csv", True)
+
+    loss_fn = tf.keras.losses.MeanAbsolutePercentageError()
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=10,
+                                                  restore_best_weights=True)
+
+    model = tf.keras.models.Sequential(relu_layer_list(10, train_feat.shape[1] // 2, train_feat.shape[1], "relu"))
+
+    model.compile(optimizer = "adam", loss = loss_fn, metrics = [tf.keras.metrics.MeanSquaredError()])
+    
+    model.fit(train_feat, train_labels, batch_size = 16, epochs = 100, validation_data = (val_feat, val_labels),
+              callbacks = [early_stop], verbose = 1, shuffle = True)
+
+    model.evaluate(val_feat, val_labels, verbose = 2)
 
 def NN():
     train_feat, train_labels, val_feat, val_labels, test_feat, test_labels = gen_data("one_hot_12feature_12predict.csv",\

@@ -18,7 +18,7 @@ def compile_data(full_data, months_in_feature=12, months_ahead_predict=12, num_c
                 newrow = np.append(newrow, cur[idx, num_cities:], axis=0)
             data = np.vstack([data, newrow])
             #case shiller index to try to predict
-            val = cur[start + months_in_feature + months_ahead_predict - 1, -6]
+            val = cur[start + months_in_feature + months_ahead_predict - 1, -9]
             labels = np.append(labels, val)
     data = np.delete(data, 0, axis=0)
     labels.shape = (len(labels),)
