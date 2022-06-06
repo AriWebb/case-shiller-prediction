@@ -29,7 +29,7 @@ def test():
     df = pd.DataFrame(np.c_[train_feat, train_labels.reshape(-1, 1)], columns = label_names + ["Prediction"])
     #print(df.corr(method = "pearson")["Prediction"][:].sort_values(ascending = False, key=abs).head(20), "\n\n\n")
     #print(df.corr(method = "spearman")["Prediction"][:].sort_values(ascending = False, key=abs).head(50))
-    #print(df.corr(method = "kendall")["Prediction"][:].sort_values(ascending = False, key=abs).head(50))
+    print(df.corr(method = "kendall")["Prediction"][:].sort_values(ascending = False, key=abs)[51:100])
 
     with open('NN_top1.json') as json_file:
         NN_data = json.load(json_file)
@@ -42,8 +42,8 @@ def test():
     ind = np.argpartition(MAPE, 20)[:20]
     ind = ind[np.argsort(MAPE[ind])]
 
-    for i in ind:
-        print(NN_list[i])
+    #for i in ind:
+        #print(NN_list[i])
 
 
 def num_features(data):
@@ -208,6 +208,6 @@ def main():
     print("Hello")
 
 if __name__ == "__main__":
-    #test()
+    test()
     #gen_data("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
-    NN()
+    #NN()
