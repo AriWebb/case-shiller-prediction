@@ -32,6 +32,8 @@ def main():
     train_feat12, train_labels12, val_feat12, val_labels12, test_feat12, test_labels12 = gen_data(data12, labels12)
     err12 = linreg(train_feat12, train_labels12, val_feat12, val_labels12)
     print("12 months in the features predicting 12 months in the future: " + str(np.mean(err12)))
+    test_err12 = linreg(train_feat12, train_labels12, test_feat12, test_labels12)
+    print("TEST 12 months in the features predicting 12 months in the future: " + str(np.mean(test_err12)))
 
     data18 = "one_hot_18feature_12predict.csv"
     labels18 = "labels_18feature_12predict.csv"
