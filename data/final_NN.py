@@ -8,7 +8,7 @@ CITIES = ['atlanta', 'boston', 'chicago', 'cleveland', 'dallas', 'denver', 'detr
           'minneapolis', 'nyc', 'phoenix', 'portland', 'sf', 'seattle', 'tampa', 'dc']
 
 LABEL = ["cpi", "violent crime", "property crime", "patents", "population", "unemployment", "case shiller",\
-          "education and health", "medical care", "motor fuel", "income", "food and bev"]
+          "education and health", "medical care", "motor fuel", "income", "food and bev", "dow", "sp", "nasdaq"]
 
 def test():
     data = np.loadtxt("one_hot_12feature_12predict.csv", delimiter=',')
@@ -118,13 +118,13 @@ def gen_data(data, labels, silly = False):
             cpi_ind.append(cpi_ind[-1] - 15)
 
         for i in range(len(train_feat)):
-            train_feat[i] = train_feat[i][cs_ind] #np.concatenate((train_feat[i][inc_ind], train_feat[i][cs_ind]))
+            train_feat[i] = np.concatenate((train_feat[i][dow_ind], train_feat[i][cs_ind])) #train_feat[i][cs_ind] #
 
         for i in range(len(val_feat)):
-            val_feat[i] = val_feat[i][cs_ind] #np.concatenate((val_feat[i][inc_ind], val_feat[i][cs_ind]))
+            val_feat[i] = np.concatenate((val_feat[i][dow_ind], val_feat[i][cs_ind])) #val_feat[i][cs_ind] #
 
         for i in range(len(test_feat)):
-            test_feat[i] = test_feat[i][cs_ind] #np.concatenate((test_feat[i][cpi_ind], test_feat[i][cs_ind]))
+            test_feat[i] = np.concatenate((test_feat[i][dow_ind], test_feat[i][cs_ind])) #test_feat[i][cs_ind] #
 
     
     print(len(train_feat[0]))
@@ -233,5 +233,5 @@ def main():
 
 if __name__ == "__main__":
     test()
-    #gen_data("one_hot_12feature_12predict.csv", "labels_12feature_12predict.csv")
     #NN()
+    #NN_test()
