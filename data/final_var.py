@@ -94,10 +94,10 @@ def run_VAR(frame, frame_train, frame_diff, n=12):
     frame_diff.index = pd.DatetimeIndex(new)
     # run VAR model
     model = VAR(frame_diff)
-    fitted = model.fit(maxlags=50)
+    fitted = model.fit(maxlags=60)
     lag = fitted.k_ar
     f_inp = frame_diff.values[-lag:]
-    fc = fitted.forecast(y=f_inp, steps=12)
+    fc = fitted.forecast(y=f_inp, steps=n)
     fc = pd.DataFrame(fc, index=frame.index[-n:], columns=frame.columns + '_2d')
     # invert transformation back to get real forecast
     rev = fc.copy()
@@ -136,7 +136,7 @@ def make_full_plot(frame, path, color="blue"):
     Returns:
         none
     """
-    fig, axes = plt.subplots(nrows=4, ncols=3, dpi=120, figsize=(10, 6))
+    fig, axes = plt.subplots(nrows=5, ncols=3, dpi=120, figsize=(10, 6))
     for i, ax in enumerate(axes.flatten()):
         data = frame[frame.columns[i]]
         ax.plot(data, color=color, linewidth=1)
@@ -164,7 +164,7 @@ def make_forecast_plot(frame, frame_test, forecasted, city, n=12):
         None
     """
     # plot actuals vs predicted
-    fig, axes = plt.subplots(nrows=int(len(frame.columns) / 2), ncols=2, dpi=150, figsize=(10, 10))
+    fig, axes = plt.subplots(nrows=5, ncols=3, dpi=150, figsize=(10, 10))
     for i, (col, ax) in enumerate(zip(frame.columns, axes.flatten())):
         forecasted[col + '_forecast'].plot(legend=True, ax=ax, color='red').autoscale(axis='x', tight=True)
         frame_test[col][-n:].plot(legend=True, ax=ax, color='blue')
@@ -231,7 +231,7 @@ def full_model(frame, city, diff_plot=False, forecast_plot=False, n=12):
     if diff_plot:
         make_full_plot(frame_diff, "./diffed" + "/" + city + ".png", 'green')
     # run VAR model on data
-    forecasted = run_VAR(frame, frame_train, frame_diff)
+    forecasted = run_VAR(frame, frame_train, frame_diff, 12)
     # plot forecasted vs actual
     if forecast_plot:
         make_forecast_plot(frame, frame_test, forecasted, city)
@@ -258,14 +258,17 @@ def find_mean_error(df):
 def main():
     # first, format the data
     df = format_data("FINAL_all_data_city_names.csv")
-    for city in CITIES:
-        frame = df[df['city'] == city]
-        frame = frame.drop(['city'], axis=1)
-        # make plot to visualize data.
-        # make_full_plot(frame, './plots' + "/" + city)
-        # run model
-        full_model(frame, city, diff_plot=True, forecast_plot=True)
-    # print(find_mean_error(df))
+    # for city in CITIES:
+    #     frame = df[df['city'] == city]
+    #     frame = frame.drop(['city'], axis=1)
+    #     # to_drop = ['city', 'cpi', 'violent crime', 'property crime', 'patents', 'food and bev']
+    #     # for i in to_drop:
+    #     #     frame = frame.drop(i, axis=1)
+    #     # make plot to visualize data.
+    #     make_full_plot(frame, './plots' + "/" + city)
+    #     # run model
+    #     full_model(frame, city, diff_plot=True, forecast_plot=True)
+    print(find_mean_error(df))
 
 
 
